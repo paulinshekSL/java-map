@@ -1,13 +1,14 @@
 package test;
 
-import main.DuplicateKeyException;
+import main.InvalidKeyException;
 import main.HashMapWithList;
+import main.KeyNotFoundException;
 import main.Map;
-import main.NonExistentKeyException;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
+import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -58,7 +59,7 @@ public class HashMapWithListTest {
       testMap.add("key", "value 2");
 
       fail();
-    } catch (DuplicateKeyException e) {
+    } catch (InvalidKeyException e) {
       // test passes, do nothing
     }
   }
@@ -72,7 +73,7 @@ public class HashMapWithListTest {
       testMap.delete("different key");
 
       fail();
-    } catch (NonExistentKeyException e) {
+    } catch (KeyNotFoundException e) {
       // test passes, do nothing
     }
   }
@@ -104,5 +105,35 @@ public class HashMapWithListTest {
     testMap.delete(KEY_2);
 
     assertFalse("containsKey should return false after deleting that key", testMap.containsKey(KEY_2));
+  }
+
+  @Test
+  public void cannotAddNullKey() {
+    try {
+      Map<String, String> testMap  = new HashMapWithList<>();
+      testMap.add(null, "value");
+
+      fail();
+    } catch (InvalidKeyException e) {
+      // do nothing so test passes
+    }
+  }
+
+  @Test
+  public void removeNullDoesNothing() {
+    Map<String, String> testMap  = new HashMapWithList<>();
+    testMap.delete(null);
+  }
+
+  @Test
+  public void getNullKeyReturnsNullValue() {
+    Map<String, String> testMap  = new HashMapWithList<>();
+    assertNull(testMap.get(null));
+  }
+
+  @Test
+  public void containsKeyNullReturnTrue() {
+    Map<String, String> testMap  = new HashMapWithList<>();
+    assertTrue(testMap.containsKey(null));
   }
 }

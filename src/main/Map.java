@@ -7,7 +7,7 @@ import java.util.Set;
  */
 public interface Map<K, V> {
   V get(K key);
-  void add(K key, V value) throws DuplicateKeyException;
+  void add(K key, V value) throws InvalidKeyException;
   Set<K> getAllKeys();
   boolean containsKey(K key);
   void delete(K key);
