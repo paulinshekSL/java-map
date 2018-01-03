@@ -30,6 +30,11 @@ public final class HashMapWithList<V, K> implements Map<K, V> {
     return false;
   }
 
+  @Override
+  public void delete(K key) {
+    
+  }
+
   private class MapEntry<A, B> {
     private A key;
     private B value;
