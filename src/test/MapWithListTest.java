@@ -1,14 +1,13 @@
 package test;
 
 import main.InvalidKeyException;
-import main.MapWithList;
 import main.KeyNotFoundException;
 import main.Map;
+import main.MapWithList;
 import org.junit.Test;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
-import static org.junit.Assert.assertNull;
 import static org.junit.Assert.assertTrue;
 import static org.junit.Assert.fail;
 
@@ -114,26 +113,44 @@ public class MapWithListTest {
       testMap.add(null, "value");
 
       fail();
-    } catch (InvalidKeyException e) {
+    } catch (NullPointerException e) {
       // do nothing so test passes
     }
   }
 
   @Test
-  public void removeNullDoesNothing() {
-    Map<String, String> testMap  = new MapWithList<>();
-    testMap.delete(null);
+  public void cannotRemoveNull() {
+    try {
+      Map<String, String> testMap  = new MapWithList<>();
+      testMap.delete(null);
+
+      fail();
+    } catch (NullPointerException e) {
+      // do nothing so test passes
+    }
   }
 
   @Test
-  public void getNullKeyReturnsNullValue() {
-    Map<String, String> testMap  = new MapWithList<>();
-    assertNull(testMap.get(null));
+  public void getNullKeyThrowsNullPointer() {
+    try {
+      Map<String, String> testMap  = new MapWithList<>();
+      testMap.get(null);
+
+      fail();
+    } catch (NullPointerException e) {
+      // do nothing so test passes
+    }
   }
 
   @Test
-  public void containsKeyNullReturnTrue() {
-    Map<String, String> testMap  = new MapWithList<>();
-    assertTrue(testMap.containsKey(null));
+  public void containsKeyNullThrowsNullPointer() {
+    try {
+      Map<String, String> testMap  = new MapWithList<>();
+      testMap.containsKey(null);
+
+      fail();
+    } catch (Exception e) {
+      // do nothing so test passes
+    }
   }
 }

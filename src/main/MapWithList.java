@@ -17,7 +17,7 @@ public final class MapWithList<V, K> implements Map<K, V> {
   @Override
   public V get(K key) {
     if (key == null) {
-      return null;
+      throw new NullPointerException();
     }
 
     Optional<MapEntry<K, V>> foundEntry = mapEntries.stream()
@@ -34,7 +34,7 @@ public final class MapWithList<V, K> implements Map<K, V> {
   @Override
   public void add(K key, V value) {
     if (key == null) {
-      throw new InvalidKeyException();
+      throw new NullPointerException();
     }
     if (findIndexFromKey(key) >= 0) {
       throw new InvalidKeyException(); // duplicate key
@@ -49,13 +49,13 @@ public final class MapWithList<V, K> implements Map<K, V> {
 
   @Override
   public boolean containsKey(K key) {
-    if (key == null) return true;
+    if (key == null) throw new NullPointerException();
     return mapEntries.stream().anyMatch(e -> e.key.equals(key));
   }
 
   @Override
   public void delete(K key) {
-    if (key == null) return;
+    if (key == null) throw new NullPointerException();
 
     // find index
     int foundIndex = findIndexFromKey(key);
