@@ -2,18 +2,27 @@ package main;
 
 import java.util.ArrayList;
 import java.util.List;
+import java.util.Optional;
 import java.util.Set;
 
-public final class HashMapWithList<V, K> implements Map<K, V> {
-  private List<MapEntry<K, V>> hashMap;
+public final class MapWithList<V, K> implements Map<K, V> {
+  private List<MapEntry<K, V>> mapEntries;
 
-  public HashMapWithList() {
-    this.hashMap = new ArrayList<>();
+  public MapWithList() {
+    this.mapEntries = new ArrayList<>();
   }
 
   @Override
   public V get(K key) {
-    return null;
+    Optional<MapEntry<K, V>> foundEntry = mapEntries.stream()
+      .filter(e -> e.key.equals(key))
+      .findFirst();
+
+    if (!foundEntry.isPresent()) {
+      throw new KeyNotFoundException();
+    }
+
+    return foundEntry.get().value;
   }
 
   @Override
@@ -42,14 +51,6 @@ public final class HashMapWithList<V, K> implements Map<K, V> {
     public MapEntry(A key, B value) {
       this.key = key;
       this.value = value;
-    }
-
-    public A getKey() {
-      return key;
-    }
-
-    public B getValue() {
-      return value;
     }
   }
 }
