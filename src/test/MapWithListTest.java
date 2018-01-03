@@ -90,7 +90,7 @@ public class MapWithListTest {
     testMap.delete(KEY_2);
 
     assertEquals(1, testMap.getAllKeys().size());
-    assertTrue("key still returned by getAllKeys after using delete method", testMap.getAllKeys().contains(KEY_2));
+    assertTrue("key still returned by getAllKeys after using delete method", !testMap.getAllKeys().contains(KEY_2));
   }
 
   @Test
