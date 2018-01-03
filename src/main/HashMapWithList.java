@@ -17,7 +17,7 @@ public final class HashMapWithList<V, K> implements Map<K, V> {
   }
 
   @Override
-  public void put(K key, V value) {
+  public void add(K key, V value) {
   }
 
   @Override
@@ -32,7 +32,7 @@ public final class HashMapWithList<V, K> implements Map<K, V> {
 
   @Override
   public void delete(K key) {
-    
+
   }
 
   private class MapEntry<A, B> {

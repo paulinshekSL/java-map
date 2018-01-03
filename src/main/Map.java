@@ -7,7 +7,7 @@ import java.util.Set;
  */
 public interface Map<K, V> {
   V get(K key);
-  void put(K key, V value);
+  void add(K key, V value);
   Set<K> getAllKeys();
   boolean containsKey(K key);
   void delete(K key);
