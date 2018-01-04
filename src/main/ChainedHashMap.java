@@ -1,9 +1,12 @@
 package main;
 
+import java.util.HashSet;
 import java.util.Iterator;
 import java.util.LinkedList;
+import java.util.List;
 import java.util.Optional;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 public class ChainedHashMap<K, V> implements Map<K, V> {
   public static final int INIT_CAPACITY = 10;
@@ -28,27 +31,11 @@ public class ChainedHashMap<K, V> implements Map<K, V> {
 
   @Override
   public V get(K key) {
-    LinkedList<MapEntry<K, V>> bucket = hashMap[key.hashCode()];
-
-    if (bucket == null) {
+    Optional<MapEntry<K, V>> optionalMapEntry = findMapEntryByKey(key);
+    if (!optionalMapEntry.isPresent()) {
       throw new KeyNotFoundException();
     }
-
-    Iterator<MapEntry<K, V>> iterator = bucket.iterator();
-    boolean found = false;
-    if (!iterator.hasNext()) {
-      throw new KeyNotFoundException();
-    }
-    MapEntry<K, V> mapEntry = iterator.next();
-
-    while (iterator.hasNext() && !found) {
-      mapEntry = iterator.next();
-      found = mapEntry.key.equals(key);
-    }
-    if (!found) {
-      throw new KeyNotFoundException();
-    }
-    return mapEntry.value;
+    return optionalMapEntry.get().value;
   }
 
   @Override
@@ -57,13 +44,25 @@ public class ChainedHashMap<K, V> implements Map<K, V> {
       throw new NullPointerException();
     }
 
-    hashMap[key.hashCode()].add(new MapEntry<>(key, value));
+    if (findMapEntryByKey(key).isPresent()) {
+      throw new InvalidKeyException();
+    }
+
+    LinkedList<MapEntry<K, V>> bucket = getOrInitialiseBucket(key);
+
+    bucket.add(new MapEntry<>(key, value));
     size++;
   }
 
   @Override
   public Set<K> getAllKeys() {
-    return null;
+    Set<K> keySet = new HashSet<>();
+    for (LinkedList<MapEntry<K, V>> bucket : hashMap) {
+      if (bucket != null) {
+        keySet.addAll(bucket.stream().map(e -> e.key).collect(Collectors.toSet()));
+      }
+    }
+    return keySet;
   }
 
   @Override
@@ -78,12 +77,29 @@ public class ChainedHashMap<K, V> implements Map<K, V> {
       throw new KeyNotFoundException();
     }
 
-    hashMap[key.hashCode()].remove(tryFind.get());
+    hashMap[calculateHash(key)].remove(tryFind.get());
     size--;
   }
 
+  private LinkedList<MapEntry<K, V>> getOrInitialiseBucket(K key) {
+    LinkedList<MapEntry<K, V>> bucket = hashMap[calculateHash(key)];
+    if (bucket == null) {
+      bucket = new LinkedList<>();
+      hashMap[calculateHash(key)] = bucket;
+    }
+    return bucket;
+  }
+
+  private int calculateHash(K key) {
+    return Math.abs(key.hashCode()) % currentCapacity;
+  }
+
   private Optional<MapEntry<K, V>> findMapEntryByKey(K key) {
-    return hashMap[key.hashCode()].stream().filter(e -> e.key.equals(key)).findFirst();
+    LinkedList<MapEntry<K, V>> bucket = hashMap[calculateHash(key)];
+    if (bucket == null) {
+      return Optional.empty();
+    }
+    return bucket.stream().filter(e -> e.key.equals(key)).findFirst();
   }
 
   private class MapEntry<L, R> {

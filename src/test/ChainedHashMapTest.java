@@ -4,8 +4,9 @@ import main.ChainedHashMap;
 import main.InvalidKeyException;
 import main.KeyNotFoundException;
 import main.Map;
-import main.MapWithList;
 import org.junit.Test;
+
+import java.util.Set;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -111,11 +112,11 @@ public class ChainedHashMapTest {
   @Test
   public void cannotAddNullKey() {
     try {
-      Map<String, String> testMap  = new MapWithList<>();
+      Map<String, String> testMap  = new ChainedHashMap<>();
       testMap.add(null, "value");
 
       fail();
-    } catch (InvalidKeyException e) {
+    } catch (NullPointerException e) {
       // do nothing so test passes
     }
   }
@@ -123,7 +124,7 @@ public class ChainedHashMapTest {
   @Test
   public void cannotRemoveNull() {
     try {
-      Map<String, String> testMap  = new MapWithList<>();
+      Map<String, String> testMap  = new ChainedHashMap<>();
       testMap.delete(null);
 
       fail();
@@ -135,7 +136,7 @@ public class ChainedHashMapTest {
   @Test
   public void getNullKeyThrowsNullPointer() {
     try {
-      Map<String, String> testMap  = new MapWithList<>();
+      Map<String, String> testMap  = new ChainedHashMap<>();
       testMap.get(null);
 
       fail();
@@ -147,11 +148,38 @@ public class ChainedHashMapTest {
   @Test
   public void containsKeyNullThrowsNullPointer() {
     try {
-      Map<String, String> testMap  = new MapWithList<>();
+      Map<String, String> testMap  = new ChainedHashMap<>();
       testMap.containsKey(null);
 
       fail();
     } catch (Exception e) {
       // do nothing so test passes
     }
-  }}
+  }
+
+  @Test
+  public void getAllKeysReturnsASetOfAllKeys() {
+    String KEY_1 = "KEY 1";
+    String KEY_2 = "KEY 2";
+    String KEY_3 = "KEY 3";
+    Map<String, String> testMap = new ChainedHashMap<>();
+    testMap.add(KEY_1, "value");
+    testMap.add(KEY_2, "value");
+    testMap.add(KEY_3, "value");
+
+    Set<String> allKeys = testMap.getAllKeys();
+
+    assertEquals(3, allKeys.size());
+    assertTrue(allKeys.contains(KEY_1));
+    assertTrue(allKeys.contains(KEY_2));
+    assertTrue(allKeys.contains(KEY_3));
+  }
+
+  @Test
+  public void getAllKeysReturnsEmptySet() {
+    Map<String, String> testMap = new ChainedHashMap<>();
+    Set<String> allKeys = testMap.getAllKeys();
+
+    assertTrue("getAllKeys should return an empty set when the map is empty", allKeys.isEmpty());
+  }
+}
