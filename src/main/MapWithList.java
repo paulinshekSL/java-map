@@ -66,6 +66,11 @@ public final class MapWithList<V, K> implements Map<K, V> {
     mapEntries.remove(foundIndex);
   }
 
+  @Override
+  public int size() {
+    return mapEntries.size();
+  }
+
   public int findIndexFromKey(K key) {
     int i = -1;
     boolean found = false;

@@ -6,7 +6,10 @@ import main.KeyNotFoundException;
 import main.Map;
 import org.junit.Test;
 
+import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
+import java.util.stream.IntStream;
 
 import static org.junit.Assert.assertEquals;
 import static org.junit.Assert.assertFalse;
@@ -181,5 +184,24 @@ public class ChainedHashMapTest {
     Set<String> allKeys = testMap.getAllKeys();
 
     assertTrue("getAllKeys should return an empty set when the map is empty", allKeys.isEmpty());
+  }
+
+  @Test
+  public void mapContainsTheSameElementsAfterResizing() {
+    // Create empty map
+    ChainedHashMap<String, String> testMap = new ChainedHashMap<>();
+
+    // create INIT_CAPACITY * 0.7 + 1 number of elements to put in the map
+    int numberOfTestElements = (int) (ChainedHashMap.INIT_CAPACITY * 0.7) + 1;
+    IntStream.range(0, numberOfTestElements).forEach(i -> {
+      testMap.add("Key " + i, "Value " + i);
+    });
+
+    // Check size
+    assertEquals(numberOfTestElements, testMap.size());
+    // Check that all elements are contained in  the map
+    IntStream.range(0, numberOfTestElements).forEach(i -> {
+      assertEquals("Value " + i, testMap.get("Key " + i));
+    });
   }
 }

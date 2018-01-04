@@ -1,9 +1,8 @@
 package main;
 
 import java.util.HashSet;
-import java.util.Iterator;
 import java.util.LinkedList;
-import java.util.List;
+import java.util.Objects;
 import java.util.Optional;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -48,8 +47,9 @@ public class ChainedHashMap<K, V> implements Map<K, V> {
       throw new InvalidKeyException();
     }
 
-    LinkedList<MapEntry<K, V>> bucket = getOrInitialiseBucket(key);
+    resizeIfNeeded();
 
+    LinkedList<MapEntry<K, V>> bucket = getOrInitialiseBucket(key);
     bucket.add(new MapEntry<>(key, value));
     size++;
   }
@@ -81,6 +81,11 @@ public class ChainedHashMap<K, V> implements Map<K, V> {
     size--;
   }
 
+  @Override
+  public int size() {
+    return size;
+  }
+
   private LinkedList<MapEntry<K, V>> getOrInitialiseBucket(K key) {
     LinkedList<MapEntry<K, V>> bucket = hashMap[calculateHash(key)];
     if (bucket == null) {
@@ -102,6 +107,30 @@ public class ChainedHashMap<K, V> implements Map<K, V> {
     return bucket.stream().filter(e -> e.key.equals(key)).findFirst();
   }
 
+  private void resizeIfNeeded() {
+    if (size < TRIGGER_RESIZE * currentCapacity) {
+      // resize not needed so do nothing
+      return;
+    }
+
+    // do the resizing
+    currentCapacity = (int) (currentCapacity * CAPACITY_MULTIPLIER);
+    LinkedList<MapEntry<K, V>>[] newHashMap = (LinkedList<MapEntry<K, V>>[]) new LinkedList[currentCapacity];
+    // rehash all existing
+    for (LinkedList<MapEntry<K, V>> bucket : hashMap) {
+      if (bucket != null) {
+        for (MapEntry<K, V> oldEntry : bucket) {
+          int newHash = calculateHash(oldEntry.key);
+          if (newHashMap[newHash] == null) {
+            newHashMap[newHash] = new LinkedList<>();
+          }
+          newHashMap[newHash].add(new MapEntry<>(oldEntry.key, oldEntry.value));
+        }
+      }
+    }
+    hashMap = newHashMap;
+  }
+
   private class MapEntry<L, R> {
     L key;
     R value;
@@ -109,6 +138,20 @@ public class ChainedHashMap<K, V> implements Map<K, V> {
     public MapEntry(L key, R value) {
       this.key = key;
       this.value = value;
+    }
+
+    @Override
+    public boolean equals(Object o) {
+      if (this == o) return true;
+      if (o == null || getClass() != o.getClass()) return false;
+      MapEntry<?, ?> mapEntry = (MapEntry<?, ?>) o;
+      return Objects.equals(key, mapEntry.key) &&
+        Objects.equals(value, mapEntry.value);
+    }
+
+    @Override
+    public int hashCode() {
+      return Objects.hash(key, value);
     }
   }
 }

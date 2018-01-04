@@ -11,4 +11,5 @@ public interface Map<K, V> {
   Set<K> getAllKeys();
   boolean containsKey(K key);
   void delete(K key);
+  int size();
 }
